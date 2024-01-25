@@ -151,8 +151,6 @@ void ArbolBST::eliminar(int dato, Nodo* &nodo, Nodo* padre) {
         }
     }
 }
-
-//Crea funciones para encontrar el maximo y minimo valor del arbol
 Nodo* ArbolBST::minimo() {
     return minimo(raiz);
 }
