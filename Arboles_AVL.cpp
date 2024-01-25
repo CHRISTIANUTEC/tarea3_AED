@@ -63,10 +63,10 @@ public:
     bool Estavacio();       // retorna si esta vacio o no
     void insert(int dato);  // inserta un nodo con el dato en el arbol
     Nodo *buscar(int dato); // busca y retorna el nodo que tiene el dato pasado
-    Nodo *rotacion_derecha(Nodo *nodo);
-    Nodo *rotacion_izquierda(Nodo *nodo);
-    Nodo *rotacion_doble_derecha(Nodo *nodo);
-    Nodo *rotacion_doble_izquierda(Nodo *nodo);
+    Nodo *rotacion_derecha(Nodo *&nodo);
+    Nodo *rotacion_izquierda(Nodo *&nodo);
+    Nodo *rotacion_doble_derecha(Nodo *&nodo);
+    Nodo *rotacion_doble_izquierda(Nodo *&nodo);
     void eliminar(int dato); // elimina el nodo que tiene el dato pasado
     void balancear(Nodo *nodo);
     int pre_altura(Nodo *nodo);
@@ -120,26 +120,26 @@ void Arbol::insert(int dato, Nodo *nodo)
         }
     }
 }
-Nodo *Arbol::rotacion_derecha(Nodo *padre)
+Nodo *Arbol::rotacion_derecha(Nodo *&padre)
 {
     Nodo *hijo_izquierdo = padre->derecho;
     padre->izquierdo = hijo_izquierdo->derecho;
     hijo_izquierdo->derecho = padre;
     padre = hijo_izquierdo;
 }
-Nodo *Arbol::rotacion_izquierda(Nodo *padre)
+Nodo *Arbol::rotacion_izquierda(Nodo *&padre)
 {
     Nodo *hijo_derecho = padre->derecho;
     padre->derecho = hijo_derecho->izquierdo;
     hijo_derecho->izquierdo = padre;
     padre = hijo_derecho;
 }
-Nodo *Arbol::rotacion_doble_derecha(Nodo *padre)
+Nodo *Arbol::rotacion_doble_derecha(Nodo *&padre)
 {
     padre->derecho = rotacion_izquierda(padre->derecho);
     return rotacion_derecha(padre);
 }
-Nodo *Arbol::rotacion_doble_izquierda(Nodo *padre)
+Nodo *Arbol::rotacion_doble_izquierda(Nodo *&padre)
 {
     padre->izquierdo = rotacion_derecha(padre->izquierdo);
     return rotacion_izquierda(padre);
