@@ -375,6 +375,7 @@ int main()
     {
         cout << "El arbol no esta balanceado ";
     }
+    cout<<endl;
     cout << "el factor de balanceo de la raiz es: " << arbol.factor_balanceo();
 
     return 0;
