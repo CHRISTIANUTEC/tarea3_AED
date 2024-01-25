@@ -360,8 +360,16 @@ int main()
     arbol.insert(13);
     arbol.insert(17);
 
-    cout << "El arbol esta balanceado: " << (arbol.esta_balanceado() ? "Si" : "No") << endl;
-    cout << arbol.factor_balanceo();
+    
+    if(arbol.esta_balanceado()==true){
+        cout<<"El arbol si esta balanceado ";
+    }
+    else{
+        cout<<"El arbol no esta balanceado ";
+        
+    }
+    cout <<"el factor de balanceo de la raiz es: "<< arbol.factor_balanceo();
+
 
     return 0;
 }
