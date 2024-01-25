@@ -12,12 +12,17 @@ public:
     Nodo(int dato);
     int getdatoizquierdo();
     int getdatoderecho();
+    int getdato();
 };
 Nodo::Nodo(int _dato)
 {
     dato = _dato;
     izquierdo = NULL;
     derecho = NULL;
+}
+int Nodo::getdato()
+{
+    return dato;
 }
 int Nodo::getdatoizquierdo()
 {
@@ -47,9 +52,11 @@ class Arbol
     Nodo *raiz;
     void insert(int dato, Nodo *nodo);
     Nodo *buscar(int dato, Nodo *nodo);
-    void eliminar(int dato, Nodo *nodo, Nodo *padre);
+    void eliminar(int dato, Nodo *&nodo, Nodo *padre);
     bool esta_balanceado(Nodo *nodo);
     int factor_balanceo(Nodo *nodo);
+    Nodo *minimo(Nodo *nodo);
+    Nodo *maximo(Nodo *nodo);
 
 public:
     Arbol();
@@ -66,6 +73,8 @@ public:
     int altura();
     int factor_balanceo();
     bool esta_balanceado();
+    Nodo *minimo();
+    Nodo *maximo();
 };
 Arbol::Arbol()
 {
@@ -196,111 +205,109 @@ Nodo *Arbol::buscar(int dato, Nodo *nodo)
         return buscar(dato, nodo->derecho);
     }
 }
+Nodo *Arbol::minimo()
+{
+    return minimo(raiz);
+}
 
+Nodo *Arbol::minimo(Nodo *nodo)
+{
+    if (nodo == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (nodo->izquierdo == nullptr)
+    {
+        return nodo;
+    }
+    else
+    {
+        return minimo(nodo->izquierdo);
+    }
+}
+
+Nodo *Arbol::maximo()
+{
+    return maximo(raiz);
+}
+
+Nodo *Arbol::maximo(Nodo *nodo)
+{
+    if (nodo == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (nodo->derecho == nullptr)
+    {
+        return nodo;
+    }
+    else
+    {
+        return maximo(nodo->derecho);
+    }
+}
 void Arbol::eliminar(int dato)
 {
-    eliminar(dato, raiz, NULL);
+    eliminar(dato, raiz, nullptr);
 }
-void Arbol::eliminar(int dato, Nodo *nodo, Nodo *padre)
+
+void Arbol::eliminar(int dato, Nodo *&nodo, Nodo *padre)
 {
-    if (nodo == NULL)
+    if (nodo == nullptr)
     {
-        cout << "El nodo especificado no existe" << endl;
         return;
     }
-    if (dato < nodo->dato)
+
+    if (dato < nodo->getdato())
     {
-        return eliminar(dato, nodo->izquierdo, nodo);
+        eliminar(dato, nodo->izquierdo, nodo);
     }
-    else if (dato > nodo->dato)
+    else if (dato > nodo->getdato())
     {
-        return eliminar(dato, nodo->derecho, nodo);
+        eliminar(dato, nodo->derecho, nodo);
     }
-    if (nodo->izquierdo == NULL && nodo->derecho == NULL)
+    else
     {
-        if (nodo == raiz)
+        if (nodo->izquierdo == nullptr && nodo->derecho == nullptr)
         {
-            raiz = NULL;
-        }
-        else
-        {
-            if (padre->izquierdo == nodo)
+            // Nodo sin hijos
+            if (padre == nullptr)
             {
-                padre->izquierdo = NULL;
+                raiz = nullptr;
+            }
+            else if (padre->izquierdo == nodo)
+            {
+                padre->izquierdo = nullptr;
             }
             else
             {
-                padre->derecho = NULL;
+                padre->derecho = nullptr;
             }
+            delete nodo;
         }
-        delete (nodo);
-    }
-
-    else if (nodo->izquierdo != NULL && nodo->derecho != NULL)
-    {
-        Nodo *aux = nodo->derecho;
-        Nodo *padreAux = nodo;
-        while (aux->izquierdo != NULL)
+        else if (nodo->izquierdo == nullptr)
         {
-            padreAux = aux;
-            aux = aux->izquierdo;
+            // Nodo con un hijo derecho
+            Nodo *temp = nodo;
+            nodo = nodo->derecho;
+            delete temp;
         }
-
-        nodo->dato = aux->dato;
-        if (aux->derecho)
+        else if (nodo->derecho == nullptr)
         {
-            padreAux->izquierdo = aux->derecho;
-        }
-        if (padreAux->izquierdo == aux)
-        {
-            padreAux->izquierdo = NULL;
+            // Nodo con un hijo izquierdo
+            Nodo *temp = nodo;
+            nodo = nodo->izquierdo;
+            delete temp;
         }
         else
         {
-            padreAux->derecho = NULL;
+            // Nodo con dos hijos
+            Nodo *sucesor = minimo(nodo->derecho);
+            nodo->dato = sucesor->getdato();
+            eliminar(sucesor->getdato(), nodo->derecho, nodo);
         }
-
-        delete (aux);
-    }
-    else if (nodo->izquierdo != NULL)
-    {
-        if (nodo == raiz)
-        {
-            raiz = nodo->izquierdo;
-        }
-        else
-        {
-
-            if (padre->izquierdo == nodo)
-            {
-                padre->izquierdo = nodo->izquierdo;
-            }
-            else
-            {
-                padre->derecho = nodo->izquierdo;
-            }
-        }
-        delete (nodo);
-    }
-    else if (nodo->derecho != NULL)
-    {
-        if (nodo == raiz)
-        {
-            raiz = nodo->derecho;
-        }
-        else
-        {
-            if (padre->izquierdo == nodo)
-            {
-
-                padre->izquierdo = nodo->derecho;
-            }
-            else
-            {
-                padre->derecho = nodo->derecho;
-            }
-        }
-        delete (nodo);
     }
 }
 
@@ -360,16 +367,15 @@ int main()
     arbol.insert(13);
     arbol.insert(17);
 
-    
-    if(arbol.esta_balanceado()==true){
-        cout<<"El arbol si esta balanceado ";
+    if (arbol.esta_balanceado() == true)
+    {
+        cout << "El arbol si esta balanceado ";
     }
-    else{
-        cout<<"El arbol no esta balanceado ";
-        
+    else
+    {
+        cout << "El arbol no esta balanceado ";
     }
-    cout <<"el factor de balanceo de la raiz es: "<< arbol.factor_balanceo();
-
+    cout << "el factor de balanceo de la raiz es: " << arbol.factor_balanceo();
 
     return 0;
 }
